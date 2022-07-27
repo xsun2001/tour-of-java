@@ -1,0 +1,144 @@
+# Course Outline
+
+## Java
+
+- PRE: Introduction to Java Platform
+- CH0: Installation of JDK & Intellij IDEA
+  - CodeLab 0-1: helloworld
+- CH1: Basic language structure
+  - Same with cpp
+    - Comments
+    - Variable
+    - Data Type
+    - Operator
+    - Control Flow
+  - New structure
+    - String
+    - Terminal IO
+    - BigInt
+    - Array
+    - Enum
+  - CodeLab 1-1: Triangle of Stars
+  - CodeLab 1-2: a =-*/ b
+  - CodeLab 1-3: QuickSort
+  - CodeLab 1-4: Commond line arguments
+- CH2: Fundamental OOP (Object-Oriented Programming)
+  - What is an *"Object"* ?
+    - A set of *"Data"* and *"Behavior"*
+    - Examples: Car? Student?
+  - Most of OOP language is *class-based* / *classical*, which means *objects* are *instances* of *classes*.
+    - Class is the *type* of object
+    - Java is a *strong-typed* language
+    - Define fields and methods in Java
+    - Constructor & field initialize
+  - Everything is Object
+    - Java uses *Reference* to control objects
+    - Create a object
+    - Java has Garbage-Collector
+  - CodeLab 2-1: Create & Use a Car
+  - Reuse Class
+    - Composition
+    - Inheritance
+      - No multiple inheritance
+      - Access Control
+      - `final` & `@Override`
+      - Initialization of super classes
+    - Delegation
+    - When to use Which?
+    - Abstract Class
+  - CodeLab 2-2: Cars, Wheels, Engines.
+  - Enhance Functionality
+    - Interface
+      - Trait, Capbility, Protocol
+      - No data
+      - Focus on Semantic, rather than Implements
+    - `default` methods
+      - Interfaces with `default` vs abstrct classes ?
+  - Inner Class
+    - Interact with Outer class
+    - Anonymous inner class & Lambda expression
+    - `static` inner class
+    - Why Inner class
+      - Multiple inheritance
+      - Closure
+  - `static` fields and methods
+- CH3: Design Patterns
+  - Why using Design Patterns
+  - Overview
+  - Design a document editor (VSCode)
+  - Creational Patterns
+    - *Abstract Factory*: Java Swing Look&Feel
+    - *Builder*: `java.lang.StringBuilder` / Lombok `@Builder`
+    - *Factory Method*: `java.util.concurrent.Executors` / `java.util.Collections`
+    - *Singleton*: `java.lang.Runtime#getRuntime()`
+  - Structural Patterns
+    - *Adaptor*: `java.util.Arrays#asList()` `java.util.Collections#list()` `java.io.InputStreamReader(InputStream)`
+    - *Decorator*: Stream IO / `java.util.Collections`
+    - *Composite*: Java swing
+    - *Flyweight*: `java.lang.Integer#valueOf(int)`
+    - *Proxy*: `javax.inject.Inject`
+  - Behavioral patterns
+    - *Chain of responsibility*: `java.util.logging.Logger#log()`
+    - *Command*: `java.lang.Runnable`
+    - *Interpreter*: Regex `java.util.Pattern`
+    - *Iterator*: `java.util.Iterator`
+    - *Strategy*: `java.util.Comparator#compare()`
+    - *Template Method*: Stream IO / Abstract Collection / `default` method
+    - *Visitor*: `java.nio.file.FileVisitor`
+- CH4: Advanced language feature
+  - *[JEP361, Java14]* Switch Expressions
+  - *[JEP378, Java15]* Text Blocks
+  - *[JEP394, Java16]* Pattern Matching for `instanceof`
+  - *[JEP395, Java16]* Records
+  - Annotation
+  - Exception & Error handling
+  - Generic
+  - *[JEP286, Java10]* `var` type inference
+  - *[JEP409, Java17]* Sealed Classes
+  - Features in preview
+    - *[JEP427, Java19]* Pattern Matching for switch
+    - *[JEP405, Java19]* Record Patterns
+    - *[JEP425, Java19]* Virtual Threads
+    - *[JEP428, Java19]* Structured Concurrency
+- CH5: Java Standard Library
+  - `java.time`
+  - Collections
+    - Interfaces
+    - Implementations
+    - Concurrent Collection
+    - `java.util.Collections`
+  - Stream IO
+    - Input/Output Stream Reader Writer
+    - File
+  - NIO
+    - Buffer
+    - Path Files FileSystem FileVisitor
+    - Channel Pipe Selector
+  - Regex
+    - `java.util.regex`
+  - Network
+    - `java.net`
+  - *[JEP321, Java11]* HTTP Client
+    - `java.net.http`
+  - Functional Programming with Stream
+    - `java.util.stream`
+  - Concurrency
+    - `java.lang.Thread/Runnable`
+    - `synchronized` keyword and `java.util.concurrent.locks`
+    - `java.util.concurrent.atomic`
+    - `java.util.concurrent.Executor/ExecutorService/Executors`
+    - `java.util.concurrent.Semaphore/CountDownLatch/CyclicBarrier/Phaser/Exchanger`
+    - Concurrent Collections
+  - JDBC
+- CH6: Build Tools
+  - Maven
+  - Gradle
+- CH7: Using third party libraries
+  - JSON with GSON
+  - Logging with Apache Log4j2
+  - Utilities with Apache Commons & Google Guava
+  - Testing with JUnit
+  - HTTP Parsing with JSoup
+  - Web backend with Spring Framework
+  - Modern DB operation with JPA & Spring Data
+  - Machine Learning with Tribuo
