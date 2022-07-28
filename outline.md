@@ -142,3 +142,4 @@
   - Web backend with Spring Framework
   - Modern DB operation with JPA & Spring Data
   - Machine Learning with Tribuo
+  - Neural Network with Deeplearning4j
