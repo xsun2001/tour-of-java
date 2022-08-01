@@ -5,6 +5,12 @@ paginate: true
 backgroundImage: url('img/bg.jpg')
 ---
 
+<style>
+section {
+  padding: 50px;
+}
+</style>
+
 <!-- _class: lead -->
 
 ![bg left:33% w:6cm](img/java_icon.png)
@@ -99,9 +105,18 @@ backgroundImage: url('img/bg.jpg')
 
 ---
 
+# Java Version
+
+- **TLDR**：作为最新的*长期支持版本LTS*，**Java 17**将成为本次课程的目标平台。Java平台保证前向兼容，因此更新版本的Java支持本课程讲得绝大多数内容。
+- **太长不看版**
+  - Java的语法特性和版本绑定，大版本的后续更新大多都是bug修复和性能增强。但是Java7-9的发布时间分别是2011-2014-2017，以多年为跨度的更新使Java语法特性的进化严重落后于时代。
+  - 因此，从 *[[JEP 322](https://openjdk.org/jeps/322), Java10]* 开始，采用新的根据固定时间的新版本发布计划和命名方案。Java将会*每六个月*固定发布新版本，用于快速滚动开发、预览、发布新语法特性和修改。
+
+---
+
 # Install JDK *(Eclipse Temurin)*
 
-- 进网站，点下载，双击安装包
+- 所有系统通用：进网站，点下载，双击安装包
 - macOS & Homebrew
   ```bash
   $ brew install --cask temurin      // Install latest JDK18
@@ -110,10 +125,17 @@ backgroundImage: url('img/bg.jpg')
   ```
 - Linux
   ```bash
-  $ apt install temurin-17-jdk
-  $ yum install temurin-17-jdk
-  $ zypper install temurin-17-jdk
+  $ apt install temurin-17-jdk     // Debian/Ubuntu
+  $ yum install temurin-17-jdk     // CentOS/RHEL/Fedora
+  $ zypper install temurin-17-jdk  // openSUSE
   ```
+
+---
+
+# Install JDK *(Eclipse Temurin)*
+
+- 如果Temurin网站或者Linux源下载速度较慢，可以使用[TUNA镜像](https://mirrors.tuna.tsinghua.edu.cn/help/adoptium/)
+- Homebrew如果下载速度慢，需要为其设置代理
 
 ---
 
@@ -956,7 +978,7 @@ public class Car {
 
 `private String brand;`
 
-- 访问控制 + 类型 + 域名
+- 访问控制 + 类型 + 成员域名 （通常采用小驼峰）
 - *类成员变量的*默认值
   - 数字类型：`0` `0.0`
   - `boolean`：`false`
@@ -1033,6 +1055,7 @@ public class Car {
 
 ## Member methods
 
+- 成员方法的命名习惯一般为*小驼峰*
 - 成员方法就是定义在类内部的方法/函数
 - 并且也可以使用类内的成员变量和成员方法
 - 类的`public`方法组成了类所定义的对象的公开接口/功能
@@ -1439,7 +1462,7 @@ class Child extends Parent {
 **多态可以提升扩展性**。考虑下面更加实际的绘制图形的代码，图形的绘制函数接收一个画板对象，用于执行实际的绘图指令，如`drawLine(int, int, int, int)`等：
 
 ```java
-abstract class Shape { public abstract void draw(Canvas c); }
+class Shape { public void draw(Canvas c) {} }
 class Circle extends Shape { @Override public void draw(Canvas c) { ... } }
 class Rectangle extends Shape { @Override public void draw(Canvas c) { ... } }
 class Triangle extends Shape { @Override public void draw(Canvas c) { ... } }
@@ -1921,7 +1944,7 @@ interface Shape {
 
 但是这又引入了*diamond problem*，即类实现了两个具有相同`default`方法的接口时出现的实现歧义。
 
-在Java中，如果出现这种情况，你*必须*重载这个冲突的方法来提供自己的实现。如果想使用提供的`default`实现，你应当通过`<interfac_name>.super.<func_name>()`手动指定使用哪一个接口。
+在Java中，如果出现这种情况，你*必须*重载这个冲突的方法来提供自己的实现。如果想使用提供的`default`实现，你应当通过`<interface_name>.super.<func_name>()`手动指定使用哪一个接口。
 
 ---
 
@@ -2230,3 +2253,49 @@ Lambda表达式实际上可以看做一种特殊的匿名内部类：
 - 使用匿名内部类和Lambda表达式创建闭包
 
 至此，Java的所有基本语法特性均已介绍，大家已经正式入门Java啦～
+
+---
+
+<!-- _class: lead -->
+
+# *Chapter 3*
+# Design Patterns
+
+---
+
+# What are Design Patterns
+
+- *设计模式 Design Patterns*是一套最佳实践，描述了软件开发人员在面临一些一般性问题时使用和总结出的解决方案。
+- 1994年， Erich Gamma、Richard Helm、Ralph Johnson 和 John Vlissides合著了*Design Patterns - Elements of Reusable Object-Oriented Software*（《设计模式——可复用面向对象软件的基础》），首次提出了设计模式的概念，并对大多数常见的设计模式进行了分类组织和讨论。这四位作者也被称为*四人帮 GoF, Gang of Four*。
+- 合理的利用设计模式让代码组织真正的工程化，减少耦合、提升可维护性、提升复用度。
+- 本章我会带大家认识一些常见的设计模式，并介绍Java标准库中相应的设计范例。
+
+---
+
+# OOP Principle
+
+- **对接口编程而不是对实现编程**
+- **组合优先于继承**
+- **合理使用设计模式，而不要滥用**
+
+---
+
+# Creational Patterns
+
+## Catalog
+
+创造型模式描述了如何创建对象：
+
+1. *Builder* 建造者模式
+2. *Factory Method* 工厂方法模式
+3. *Abstract Factory* 抽象工厂模式
+4. *Singleton* 单例模式
+
+---
+
+# Creational Patterns
+
+## Builder
+
+我们可能经常需要构造一个复杂的对象，它是由多个子对象组成。但是子对象的创建方式一般比较固定，组合方式的多样化带来了复杂性。
+我们考虑一个KFC系统，它有很多比如汉堡、原味鸡、蛋挞等子对象，它们的做法都是不变的。但是顾客的订单可能是任意的组合。
