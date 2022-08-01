@@ -2276,6 +2276,7 @@ Lambda表达式实际上可以看做一种特殊的匿名内部类：
 
 - **对接口编程而不是对实现编程**
 - **组合优先于继承**
+- **单一职责原则：类的职责应当尽可能的少而清晰**
 - **合理使用设计模式，而不要滥用**
 
 ---
@@ -2396,7 +2397,7 @@ class HtmlBuilder implements DocumentBuilder {
 class HtmlBuilder implements DocumentBuilder {
     private StringBuilder strBuf;
     @Override public String build() {
-        return strBuf.build();
+        return strBuf.toString();
     }
 }
 ```
@@ -2439,3 +2440,309 @@ public static void main(String[] args) throws IOException {
 
 ---
 
+# Creational Patterns
+
+## Builder
+
+Java内最知名的构建者实例就是`java.lang.StringBuilder`，它提供了构建大型字符串所需的所有方法：
+
+- `append(*)` `insert(int, *)` `replace(int, int, String)`
+- `length()` `charAt(int)` `substring(int, int)`
+- `toString()`
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+考虑IntelliJ IDEA和现在绝大多数GUI编辑器/IDE，它们都支持换主题皮肤的功能。我们可以为每一套皮肤都提供一整套GUI实现，但是显然这个工作量就过大了。
+
+我们发现，GUI一般都由一些基本的元素组成，如按钮、菜单、文本框、文本区等。这些基本元素被称为*组件 Widget*。它们可能会有不同的渲染实现，但是GUI的布局总是相同的。因此我们可以分离这两者。
+
+不同的皮肤实际上是提供了不同实现的组件的类，这个类被称为*抽象工厂 Abstract Factory*。
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+```java
+class Button    { /* ... */ }
+class TextField { /* ... */ }
+class TextArea  { /* ... */ }
+class Toolbar   { /* ... */ }
+
+// Abstract Factory
+interface Theme {
+    Button    createButton();
+    TextField createTextField();
+    TextArea  createTextArea();
+    Toolbar   createToolbar();
+}
+```
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+```java
+class DarkButton    extends Button    { /* ... */ }
+class DarkTextField extends TextField { /* ... */ }
+class DarkTextArea  extends TextArea  { /* ... */ }
+class DarkToolbar   extends Toolbar   { /* ... */ }
+
+class DarkTheme implements Theme {
+    @Override public Button    createButton()    { return new DarkButton(); }
+    @Override public TextField createTextField() { return new DarkTextField(); }
+    @Override public TextArea  createTextArea()  { return new DarkTextArea(); }
+    @Override public Toolbar   createToolbar()   { return new DarkToolbar(); }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+```java
+class LightButton    extends Button    { /* ... */ }
+class LightTextField extends TextField { /* ... */ }
+class LightTextArea  extends TextArea  { /* ... */ }
+class LightToolbar   extends Toolbar   { /* ... */ }
+
+class LightTheme implements Theme {
+    @Override public Button    createButton()    { return new LightButton(); }
+    @Override public TextField createTextField() { return new LightTextField(); }
+    @Override public TextArea  createTextArea()  { return new LightTextArea(); }
+    @Override public Toolbar   createToolbar()   { return new LightToolbar(); }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+```java
+class GUI {
+    private final Theme theme;
+    public GUI(Theme theme) {
+        this.theme = theme;
+        build();
+    }
+
+    private void build() {
+        var btn1 = theme.createButton();
+        btn1.setGeometry(10, 10, 30, 10);
+        btn1.setText("This is a button");
+    }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+应用抽象工厂模式可以：
+
+1. 隔离具体实现类。
+2. 更换具体实现类的家族，并保证这些实现类的行为一致性。
+
+应当使用抽象工厂模式，当：
+
+1. 你的系统和它所以依赖的组件的创建、组合和内部表示是独立的
+2. 你的系统需要更换组件家族，而组件家族被设计为需要一起使用
+
+---
+
+# Creational Patterns
+
+## Abstract Factory
+
+Java Swing是Java提供的跨平台GUI库，它就提供了和我们例子很类似的更换主题，或者叫*Java Swing Look&Feel (L&F)*的功能，这是抽象工厂模式的最经典例子。
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+考虑一个需要数据库连接的应用。对不同数据库的连接是由不同类来实现和处理的，但是具体的数据库类型一般不是编译期决定的，而是由运行时的配置文件等控制。
+
+通过*工厂方法 Factory Method*，可以将创建具体数据库连接的责任转移给工厂方法内部。其得名，就是因为它负责“制造”对象，就如同一个工厂一样。
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+```java
+interface DatabaseConnection {
+    void open();
+    Result executeSQL(String sql);
+    void close();
+}
+
+class MySqlConnection    implements DatabaseConnection { /* ... */ }
+class SqliteConnection   implements DatabaseConnection { /* ... */ }
+class PostgresConnection implements DatabaseConnection { /* ... */ }
+```
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+```java
+class DatabaseConnectionFactory {
+    private String type;
+    public DatabaseConnectionFactory(String type) { this.type == type; }
+
+    public DatabaseConnection createConnection() {
+        return switch(type) {
+            case "mysql"    -> new MySqlConnection();
+            case "sqlite"   -> new SqliteConnection();
+            case "postgres" -> new PostgresConnection();
+            default         -> null;
+        }
+    }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+
+```java
+public static main(String[] args) {
+    var factory = new DatabaseConnectionFactory(args[0]);
+    var conn = factory.createConnection();
+    conn.open();
+    conn.executeSQL("SELECT * FROM user");
+    conn.close();
+}
+```
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+工厂方法通常也可以是静态的`static`：
+
+```java
+class DatabaseConnectionFactory {
+    public static DatabaseConnection createConnection(String type) {
+        return switch(type) {
+            case "mysql"    -> new MySqlConnection();
+            case "sqlite"   -> new SqliteConnection();
+            case "postgres" -> new PostgresConnection();
+            default         -> null;
+        }
+    }
+}
+var conn = DatabaseConnectionFactory.createConnection(args[0]);
+```
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+工厂方法是Java中应用最广泛的设计模式之一。
+
+1. 消除对具体实现类的编译期绑定，进而强化了面向接口编程
+2. 工厂方法实际上和构造器的功能非常相似，这个设计模式有时还被称作*虚拟构造器 virtual constructor*。工厂方法命名和语法都更加自由，可以作为更灵活、语义更明显的构造器使用。
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+Java中工厂方法的应用随处可见：
+
+- 各个接口中的`of`系列静态方法几乎都是静态工厂方法：
+  - `Set.of(...)` `Map.of(...)` `List.of(...)`
+  - `Year.of()` `Mouth.of()` `DayOfWeek.of()`
+  - `Path.of()`
+
+---
+
+# Creational Patterns
+
+## Factory Method
+
+Java中工厂方法的应用随处可见：
+
+- `java.util.concurrent.Executors`提供了若干工厂方法来实例化满足不同线程调度需求的执行器实现
+- `java.sql.DriverManager`是Java标准库对本节例子的具体体现
+  - `java.sql.DriverManager#getConnection(String url)`通过解析url中的协议名，自动在类路径中寻找符合要求的数据库驱动类，然后通过数据库驱动建立连接
+
+---
+
+# Creational Patterns
+
+## Singleton
+
+*单例 Singleton*模式说明某些类只应当存在一个实例。比如OS只应该有一个窗口管理球，也只应该有一个（逻辑上的）文件系统。对Java程序来说，Java运行时环境也应该是唯一的。事实也是如此，`java.lang.Runtime`类的确是一个单例，需要使用`java.lang.Runtime#getRuntime()`获取这个对象。
+
+---
+
+# Creational Patterns
+
+## Singleton
+
+```java
+class Singleton {
+    private static INSTANCE;                 // 1.
+    private Singleton() { /* ... */ }        // 2.
+
+    public static Singleton getInstance() {  // 3.
+        if(INSTANCE == null) {               // 4.
+            INSTANCE = new Singleton();
+        }
+        return INSTANCE;
+    }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Singleton
+
+1. 用私有静态成员域保存单例对象
+2. 将构造器设置为私有的*private*，这可以防止他人新建其他的对象来破坏单例
+3. 如果单例需要在并发环境下使用，可以加入`synchronized`关键字来保证这个函数同时只能有一个线程进入执行
+4. 一般采用*懒初始化*的方法，在真正需要单例的时候再创建。
+
+---
+
+# Structural Patterns
+
+## Catalog
+
+结构化模式告诉我们如何组织、重用不同的类：
+
+1. *Adapter* 适配器模式
+2. *Decorator* 装饰器模式
+3. *Composite* 组合模式
+4. *Flyweight* 享元模式
+5. *Proxy* 代理模式
