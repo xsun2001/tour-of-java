@@ -2297,5 +2297,145 @@ Lambda表达式实际上可以看做一种特殊的匿名内部类：
 
 ## Builder
 
-我们可能经常需要构造一个复杂的对象，它是由多个子对象组成。但是子对象的创建方式一般比较固定，组合方式的多样化带来了复杂性。
-我们考虑一个KFC系统，它有很多比如汉堡、原味鸡、蛋挞等子对象，它们的做法都是不变的。但是顾客的订单可能是任意的组合。
+考虑我们现在看到的这个课件。我使用[Marp](https://marp.app/)将Markdown转化为PPT形式的课件。它也有将Markdown转化为Html等其他格式的能力。
+
+Markdown的结构都是统一的，由多级标签、列表、代码块等基础元素组成。但是背后成品的表现形式是多样化的。如果我们直接写Markdown到PDF/Html的方法，那么可能需要重复写读取、解析Markdown的过程。这时我们就需要*构建者*模式来优化设计。
+
+---
+
+# Creational Patterns
+
+## Builder
+
+构建者模式通常由一个*指导者 Director*类、一个*构造者 Builder*接口/抽象类和若干个具体构建者实现类组成。
+在我们的例子中，*Builder*提供构建其他格式文档所需要的接口：
+
+```java
+interface DocumentBuilder {
+    void appendText(String para);
+    void appendHeader(String header, int level);
+    void appendInlineCode(String code);
+    // ... More elements
+    String build();  // Get build result
+}
+```
+
+---
+
+# Creational Patterns
+
+## Builder
+
+*Director*管理Markdown的解析，并使用*Builder*构建转化后的文档：
+
+```java
+class MarkdownDirector {
+    private final DocumentBuilder builder;
+    public MarkdownDirector(DocumentBuilder builder) { this.builder = builder; }
+    public String convert(String markdownText) {
+        markdownText.lines().forEach(this::parseLine);
+        return builder.build();
+    }
+    private void parseLine(String line) {
+        // ...
+    }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Builder
+
+*Director*管理Markdown的解析，并使用*Builder*构建转化后的文档：
+
+```java
+// Demo implement
+private void parseLine(String line) {
+    if (line.startsWith("###### ")) builder.appendHeader(line.substring(7), 6);
+    if (line.startsWith("##### ")) builder.appendHeader(line.substring(6), 5);
+    // ...
+    if (line.startsWith("# ")) builder.appendHeader(line.substring(2), 1);
+    if (line.startsWith("- ")) builder.appendUnorderedList(line.substring(2));
+    // ...
+}
+```
+
+---
+
+# Creational Patterns
+
+## Builder
+
+具体的*Builder*实现包含了对应具体目标文件格式的转化实现，比如：
+
+```java
+class HtmlBuilder implements DocumentBuilder {
+    private StringBuilder strBuf;
+    @Override public void appendText(String para) {
+        strBuf.append("<p>").append(para).append("</p>\n");
+    }
+    @Override public void appendHeader(String header, int level) {
+        strBuf.append("<h" + level + ">")
+              .append(header)
+              .append("</h" + level + ">\n")
+    }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Builder
+
+具体的*Builder*实现包含了对应具体目标文件格式的转化实现，比如：
+
+```java
+class HtmlBuilder implements DocumentBuilder {
+    private StringBuilder strBuf;
+    @Override public String build() {
+        return strBuf.build();
+    }
+}
+```
+
+---
+
+# Creational Patterns
+
+## Builder
+
+作为这个格式转化系统的使用者，我们可以根据需要的文件格式提供相应的构建器：
+
+```java
+public static void main(String[] args) throws IOException {
+    DocumentBuilder builder = switch (args[2]) {
+        case "pdf"  -> new PDFBuilder();
+        case "html" -> new HtmlBuilder();
+        default     -> { System.exit(-1); yield null; }
+    }
+    String markdown = Files.readString(Path.of(args[0]));
+    String result = new MarkdownDirector(builder).convert(markdown);
+    Files.writeString(Path.of(args[1]), result);
+}
+```
+
+---
+
+# Creational Patterns
+
+## Builder
+
+使用建造者模式的好处在于：
+
+1. 分离*指导者*和*构建者*的具体实现。*指导者*无需关心具体结果对象的具体内部表示形式、实现方法和组成顺序。
+2. 提升模块化，有利于合作开发，也有利于快速定位错误。
+
+在以下情况使用建造者模式：
+
+1. 复杂对象的创建*流程*和*具体内部实现、数据表示*是分离的
+
+---
+
