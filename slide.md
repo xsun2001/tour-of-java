@@ -1086,7 +1086,7 @@ public class Car {
 ## Getters & Setters
 
 - 在大多数情况下，类的成员变量应当被封装为`private`，对他们的访问和修改应该由相应的方法处理
-- 对于非`boolean`型域，一般使用`isXXX` `setXXX`
+- 对于`boolean`型域，一般使用`isXXX` `setXXX`
 - 对于其他类型域，一般使用`getXXX` `setXXX`
 - 对于简单的读写操作，这些代码确实是没什么用的模版代码，但是
   - IDE提供代码自动生成功能
