@@ -43,6 +43,7 @@
       - Access Control
       - `final` & `@Override`
       - Initialization of super classes
+      - `java.lang.Object`
     - Delegation
     - When to use Which?
     - Abstract Class
