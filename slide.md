@@ -849,6 +849,18 @@ jshell> System.out.println(Arrays.deepToString(matrix))
 
 # Other basic syntax & API
 
+## Array Utility
+
+API Ref: [java.util.Arrays](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html)
+
+- API是*应用编程接口 Application Programming Interface*，描述了Java类库向外提供的功能、使用方法、注意事项等信息。
+- JavaDoc是内置的生成网站形式的API文档的方式，Java标准库参考文档，也就是[API Ref](https://docs.oracle.com/en/java/javase/17/docs/api/)就使用JavaDoc生成的。
+- Java标准库内容丰富，生态庞大，学会阅读、查找、遵循API文档是充分利用Java优势的第一步。
+
+---
+
+# Other basic syntax & API
+
 ## String
 
 ```java
@@ -904,6 +916,8 @@ jshell> s.equalsIgnoreCase("i lOve jAVA")
 $50 ==> true
 ```
 
+API Ref: [java.lang.String](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html)
+
 ---
 
 # Other basic syntax & API
@@ -940,6 +954,8 @@ jshell> input.hasNextBoolean()
 $89 ==> false
 ```
 
+API Ref: [java.util.Scanner](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Scanner.html)
+
 ---
 
 # Other basic syntax & API
@@ -948,7 +964,6 @@ $89 ==> false
 
 ```java
 jshell> import java.math.BigInteger;
-
 jshell> 1000000000000000 + 1
 |  错误:
 |  整数太大
@@ -956,10 +971,11 @@ jshell> 1000000000000000 + 1
 |  ^
 jshell> new BigInteger("1000000000000000").add(BigInteger.ONE)
 $92 ==> 1000000000000001
-
 jshell> new BigInteger("19260817").isProbablePrime(10)
 $93 ==> true
 ```
+
+API Ref: [java.math.BigInteger](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigInteger.html)
 
 ---
 
@@ -968,7 +984,7 @@ $93 ==> true
 ## `BigInteger` `BigDecimal`
 
 ```java
-jshell> import java.math.BigInteger;
+jshell> import java.math.BigDecimal;
 
 jshell> 0.1 + 0.2
 $94 ==> 0.30000000000000004
@@ -979,6 +995,8 @@ $95 ==> 0.3
 jshell> new BigDecimal("0.000000001").toEngineeringString()
 $100 ==> "1E-9"
 ```
+
+API Ref: [java.math.BigDecimal](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html)
 
 ---
 
@@ -1019,6 +1037,8 @@ $108 ==> 2.82842712474619
 jshell> Math.sqrt(2)
 $109 ==> 1.4142135623730951
 ```
+
+API Ref: [java.lang.Math](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Math.html)
 
 ---
 
@@ -1173,6 +1193,29 @@ public class Car {
 
 # *CodeLab 2-1* Build a `Car` in Java
 
+## Declare member fields
+
+- `final`修饰的成员变量是常量，因此除了声明赋值、构造函数、实例初始化块之外，不允许对其进行其他修改
+  - `private final String finalVar`;
+
+---
+
+# *CodeLab 2-1* Build a `Car` in Java
+
+## Declare member fields
+
+- `static`修饰的变量称为类变量，它不属于对象而属于类，因此访问的时候需要使用`<class_name>.`
+  ```java
+  class Test { public static String var = "class var"; }
+  
+  System.out.println(Test.var);
+  ```
+- 通常使用`public static final`来声明一个全局类常量，常量的命名惯例是*全大写+用`_`分隔单词*
+
+---
+
+# *CodeLab 2-1* Build a `Car` in Java
+
 ## 构造器 constructor
 
 ```java
@@ -1210,6 +1253,35 @@ public class Car {
 
 - 类的成员方法可以访问类的域和方法而不需要`this`指定
 - 但是如果出现了变量或者形参名字冲突，则需要`this.`手动指定
+
+---
+
+# *CodeLab 2-1* Build a `Car` in Java
+
+## 实例初始化块 Instance Initialization Block
+
+在类中直接使用`{}`扩起来的部分称为实例初始化块，它会在任何构造器运行之前运行。
+
+```java
+class Test {
+    { System.out.println("This is an Instance Initialization Block"); }
+    public Test() {
+        System.out.println("This is a constructor");
+    }
+}
+
+jshell> new Test()
+This is an Instance Initialization Block
+This is a constructor
+```
+
+---
+
+# *CodeLab 2-1* Build a `Car` in Java
+
+## 静态初始化块 Static Initialization Block
+
+在类中使用`static {}`扩起来的部分称为静态初始化块。这个块会在类加载的时候运行一次。如果现在不是很清楚Java类加载的顺序和机制，那只需要记住，在绝大多数情况下，这个块在一个Java程序运行的过程中，会且只会运行一次。
 
 ---
 
@@ -1858,6 +1930,8 @@ var shape = new Shape(); // Error
 - `boolean equals(Object obj)`
 - `int hashCode()`
 
+其他函数与更加细致的描述参见API文档：[java.lang.Object](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html)
+
 ---
 
 # Base of all: `java.lang.Object`
@@ -2422,6 +2496,65 @@ Lambda表达式实际上可以看做一种特殊的匿名内部类：
 - 比如我们的`Calculator`就只包含一个方法`int apply(int)`，因此可成为函数式接口。
 
 关于Lambda表达式的其他用法和标准库支持，我们会在*高级语法特性*章节中详细讲解。
+
+---
+
+# Enum
+
+*枚举 Enum*是一种特殊的类，用于为一系列相关的常量提供命名空间和更好的语义。
+
+```java
+public enum Size { SMALL, MEDIUM, LARGE, EXTRA_LARGE }
+```
+
+这等价于：
+
+```java
+public class Size extends Enum<Size> {
+    public static final Size SMALL       = new Size();
+    public static final Size MEDIUM      = new Size();
+    public static final Size LARGE       = new Size();
+    public static final Size EXTRA_LARGE = new Size();
+}
+```
+
+---
+
+# Enum
+
+枚举类也可以有构造器，我们需要声明枚举项的同时提供构造器的参数：
+
+```java
+public enum Size {
+    SMALL("S"), MEDIUM("M"), LARGE("L"), EXTRA_LARGE("XL");
+    
+    private String abbr;
+    private Size(String abbr) { this.abbr = abbr; }
+    public String getAbbr() { return abbr; }
+}
+```
+
+---
+
+# Enum
+
+可以像访问类常量一样访问枚举项：`var mySize = Size.LARGE;`
+
+`toString()`被实现为返回枚举项的名字：
+
+```java
+jshell> Size.SMALL.toString()
+$31 ==> "SMALL"
+```
+
+`ordinal()`返回枚举项的次序：
+
+```java
+jshell> Size.EXTRA_LARGE.ordinal()
+$32 ==> 3
+```
+
+更多方法参见API文档：[java.lang.Enum<E>](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Enum.html)
 
 ---
 
@@ -3859,3 +3992,529 @@ var comparator = Comparator<User>
 # Advanced language feature
 
 ---
+
+# Advanced language feature
+
+# JEP: JDK Enhancement Proposals
+
+- 目前，Java的新特性、功能均需要先提出并起草*JEP*草案
+- 在OpenJDK社区充分审核、修改、投票后成为正式的、带编号*JEP*提案
+- 开发*JEP*对应的功能分支，通过所有平台测试、代码审查后，择期并入下一个发行版本的主分支
+- 本节课提到的*JEP*都标注了并入的Java版本和提案原文连接，便于同学们学习参考
+
+---
+
+# Advanced language feature
+
+## *[[JEP361](https://openjdk.org/jeps/361), Java14]* Switch Expressions
+
+与传统的`switch`不同，`switch`表达式使用`->`连接`case`子句和具体代码块，并且`case`子句可以一次匹配多个，代码块也不需要`break`来防止连续执行。
+
+```java
+switch (day) {
+    case MONDAY, FRIDAY, SUNDAY -> System.out.println(6);
+    case TUESDAY                -> System.out.println(7);
+    case THURSDAY, SATURDAY     -> System.out.println(8);
+    case WEDNESDAY              -> System.out.println(9);
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP361](https://openjdk.org/jeps/361), Java14]* Switch Expressions
+
+`switch`表达式，顾名思义可以产生表达式的值：
+
+```java
+static void howMany(int k) {
+    System.out.println(
+        switch (k) {
+            case  1 -> "one";
+            case  2 -> "two";
+            default -> "many";
+        }
+    );
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP361](https://openjdk.org/jeps/361), Java14]* Switch Expressions
+
+如果需要复杂代码块，使用`{}`包围，并使用`yield`关键字产生`case`子句对应的值：
+
+```java
+int j = switch (day) {
+    case MONDAY  -> 0;
+    case TUESDAY -> 1;
+    default      -> {
+        int k = day.toString().length();
+        int result = f(k);
+        yield result;
+    }
+};
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP394](https://openjdk.org/jeps/394), Java16]* Pattern Matching for `instanceof`
+
+使用`instanceof`判断一个对象是否为一个类的实例。一般来说，如果判断出确实是某一个类的实例，那下面一般都要向下转型为那个类的对象后再使用：
+
+```java
+Object o = createObject();
+if (o instanceof MyClass) {
+    var myobj = (MyClass) o;
+    // do something with myobj
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP394](https://openjdk.org/jeps/394), Java16]* Pattern Matching for `instanceof`
+
+为了简化这这一过程，引入了`instanceof`的模式匹配语法：
+
+```java
+Object o = createObject();
+if (o instanceof MyClass myobj) {
+    // do something with myobj
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP394](https://openjdk.org/jeps/394), Java16]* Pattern Matching for `instanceof`
+
+模式匹配出的变量名的作用域会由Java自动推导：
+
+```java
+Object o = createObject();
+if (o instanceof MyClass myobj) {
+    // myobj is available
+}
+// myobj is not available
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP394](https://openjdk.org/jeps/394), Java16]* Pattern Matching for `instanceof`
+
+模式匹配出的变量名的作用域会由Java自动推导：
+
+```java
+Object o = createObject();
+if (!(o instanceof MyClass myobj)) {
+    // myobj is NOT available
+}
+// myobj is available
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP394](https://openjdk.org/jeps/394), Java16]* Pattern Matching for `instanceof`
+
+模式匹配出的变量名的作用域会由Java自动推导：
+
+```java
+Object o = createObject();
+if (o instanceof String s && s.length() > 5) { // s is available after &&
+    // s is available
+}
+// s is available
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP394](https://openjdk.org/jeps/394), Java16]* Pattern Matching for `instanceof`
+
+模式匹配出的变量名的作用域会由Java自动推导：
+
+```java
+Object o = createObject();
+if (o instanceof String s || s.length() > 5) { // CE!
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP395](https://openjdk.org/jeps/395), Java16]* Records
+
+对于纯数据类，我们仍然要定义一大堆构造函数、赋值、Getter&Setter、`toString`、`hashCode()`、`equals(Object)`等一大堆方法。尽管这些方法都可以让IDE帮忙生成，但是一大堆没营养的代码堆在那里都让人觉得异常繁琐。
+
+*记录 Record*就是为了解决这个问题而生。*Record*是一个**只读**的数据类，并且Java编译器会自动生成上面说的那一堆方法。
+
+---
+
+# Advanced language feature
+
+## *[[JEP395](https://openjdk.org/jeps/395), Java16]* Records
+
+```java
+record Point(int x, int y) {}
+```
+
+这就是一个典型的*Record*。它大多数行为都与普通类没有区别，除了它的Getter方法不叫`getXXX`而直接和变量名相同：
+
+<div class="columns">
+<div>
+
+```java
+jshell> var p1 = new Point(1, 2)
+p1 ==> Point[x=1, y=2]
+jshell> p1.toString()
+$35 ==> "Point[x=1, y=2]"
+jshell> p1.hashCode()
+$36 ==> 33
+```
+
+</div>
+<div>
+
+```java
+jshell> p1.x()
+$37 ==> 1
+jshell> var p2 = new Point(2, 3)
+p2 ==> Point[x=2, y=3]
+jshell> p1.equals(p2)
+$38 ==> false
+```
+
+</div>
+</div>
+
+---
+
+# Advanced language feature
+
+## *[[JEP395](https://openjdk.org/jeps/395), Java16]* Records
+
+### Compact Canonical Constructor
+
+可以使用紧凑型构造器来预处理或验证输入参数：
+
+```java
+record Rational(int num, int denom) {
+    Rational {
+        int gcd = gcd(num, denom);
+        num /= gcd;
+        denom /= gcd;
+    }
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP395](https://openjdk.org/jeps/395), Java16]* Records
+
+### Compact Canonical Constructor
+
+紧凑型构建器运行完后，Java会再根据改变后的参数值对成员域进行一遍初始化。
+
+---
+
+# Advanced language feature
+
+## *[[JEP395](https://openjdk.org/jeps/395), Java16]* Records
+
+### Conventional Constructor
+
+也可以定义传统的构建器：
+
+```java
+record Rational(int num, int denom) {
+    Rational(int num, int demon) {
+        int gcd = gcd(num, denom);
+        num /= gcd;
+        denom /= gcd;
+        this.num = num;
+        this.denom = denom;
+    }
+}
+```
+
+---
+
+# Advanced language feature
+
+## *[[JEP395](https://openjdk.org/jeps/395), Java16]* Records
+
+### Rules
+
+- *record*类不应该继承其他的类，因为它默认继承`java.lang.Record`
+- *record*类隐式为`final`，并不允许为`abstract`
+- *record*类的成员变量隐式为`final`
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+*注解 Annotation*为代码提供了一些附加信息，如`@Override`。通过提供响应的注解处理程序，可以实现：
+
+1. 编译时代码检查
+2. 编译时代码生成
+3. 运行时动态发现与注册
+
+等功能。
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+本次课程不讲解反射系统，因此也不会设计注解处理程序的设计。本节的目的在于如何使用注解语法。
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+Java标准库内提供的注解有：
+
+- `@Override`：检查是否重载方法
+- `@Deprecated`：表示注解的类、常量、方法被废弃
+- `@FunctionalInterface`：表示注解的接口是函数式接口
+- `@SuppressWarnings`：用于让编译器忽略特定的警告
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+注解也可以有参数值，如`@Deprecated`有`forRemoval`（警告后续版本会被移除）和`since`（从那个版本开始废弃），语法如下：
+
+```java
+@Deprecated(forRemoval=true, since="v233")
+class OldClass { /* ... */ }
+```
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+声明注解的语法如下：
+
+```java
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE,
+                METHOD, PACKAGE, MODULE, PARAMETER, TYPE})
+public @interface Deprecated {
+    String since() default "";
+    boolean forRemoval() default false;
+}
+```
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+- `@Document`：提示这个注解应该被收入JavaDoc
+- `@Retention(RetentionPolicy.RUNTIME)`：表示这个注解的信息应该保留到什么时候
+  - `RetentionPolicy.RUNTIME`：保留至运行时，反射系统可以读取
+  - `RetentionPolicy.CLASS`：保留至类文件
+  - `RetentionPolicy.SOURCE`：编译后即被丢弃
+- `@Target(value={ /* ... */ })`：提示这个注解可以应用给谁
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+- `@interface`：声明注解
+- `<Type> name() [default <value>]`：声明某一类型的参数，可以提供默认值
+
+---
+
+# Advanced language feature
+
+## Annotation
+
+注解系统在Java标准库中应用较少，但是在其他库，如Lombok，Spring等中，都会起到举足轻重的作用。如果有时间，我们也会接触到这些类库。
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+Java的错误处理机制是基于*异常 Exception*的。Java程序中的任何问题、错误都是一个`java.lang.Throwable`对象，代表可以被`throw`抛出。它的子类有：
+
+- `java.lang.Throwable`
+  - `java.lang.Exception`：异常，可恢复的程序代码错误，应当处理
+  - `java.lang.Error`：错误，JVM严重的、不可恢复的错误，程序员不应当处理它们
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+想要向外部抛出异常表示程序出错，使用`throw`：
+
+```java
+if (!SUPPORTED_FILETYPE.contains(filetype)) {
+    throw new IllegalArgumentException(filetype + " is not supported");
+}
+```
+
+异常均支持在实例化的时候提供自定义的错误信息以便调试查错。
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+想要捕获异常，使用`try-catch`：
+
+```java
+try {
+    var content = Files.readString(Path.of(location));
+} catch (IOException e) {
+    System.err.println("Failed to read " + location);
+    e.printStackTrace();
+}
+```
+
+使用`printStackTrace()`函数打印异常栈信息，描述了异常传播的途径和对应的源代码位置等信息。
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+你可以利用捕获的异常去构建其他类型等异常并重新抛出，原来捕获等异常就称为新异常的*原因*。这样可以提升异常系统的语义，也防止单一异常栈过长：
+
+```java
+try {
+    var config = Files.readString(Path.of(configFile));
+} catch (IOException e) {
+    throw new GameInitException("Failed to read config file", e);
+}
+```
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+你可以一次捕获多个异常：
+
+```java
+try {
+    var config = Files.readString(Path.of(configFile));
+    var jsonConfig = parseJSON(config);
+} catch (IOException e) {
+    throw new GameInitException("Failed to read config file", e);
+} catch (JSONException e) {
+    throw new GameInitException("Config file format error", e);
+}
+```
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+如果有一些系统资源，如文件句柄等，无论后续读取是否正常，都应该将其关闭。这时就需要`finally`子句进行资源回收：
+
+```java
+var input = new FileReader("file.txt");
+try {
+    // read data using input
+} catch (IOException e) {
+    // error handling
+} finally {
+    input.close();
+}
+```
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+对于实现了`AutoCloseable`接口的类，如所有输入输出组件，支持`try-with-resources`自动调用`close()`而无需`finally`：
+
+
+```java
+try (var input = new FileReader("file.txt")) {
+    // read data using input
+} catch (IOException e) {
+    // error handling
+}
+```
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+异常分为两类：
+
+- `java.lang.RuntimeException`：运行时异常，又称为非检查异常。通常表示程序逻辑错误，比如数组越界，空指针等问题。
+- 其他`java.lang.Exception`子类但是不是`java.lang.RuntimeException`子类的其他类：受检查异常。通常表示外部环境诱导的错误，程序应该考虑这些情况并进行处理，比如文件不存在，网络连接超时等问题。
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+受检查异常得名的原因在于：
+
+- 可能抛出受检查异常的代码必须被`try-catch`处理，或者向外部声明自己可能传播受检查异常
+
+通过`throws`子句声明方法可能会抛出某些受检查异常：
+
+```java
+public static void main(String[] args) throws IOException {
+    var content = Files.readString(Path.of(args[0]));
+}
+```
+
+---
+
+# Advanced language feature
+
+## Exception Handling
+
+你可以使用Java标准库中提供的异常类，请参见[API Ref](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html)中的`Direct Known Subclasses`小节寻找是否有自己需要的异常类。
+
+通过继承自`java.lang.Exception`或`java.lang.RuntimeException`，你也可以创建自定义的受检异常和非受检异常类。你可以让其包含更多调试信息或生成更清晰直观的`toString()`表示。
