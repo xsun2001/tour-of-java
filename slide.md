@@ -1036,7 +1036,7 @@ $109 ==> 1.4142135623730951
 
 - `codelab/chapter1/src/Lab2.java`
 - 实现`public static void quickSort(int[] arr)`
-- 运行`main`方法会自动检测实现的正确性和算法复杂度是否吻合$O(n\log n)$
+- 运行`main`方法会自动检测实现的正确性
 
 ---
 
