@@ -7,7 +7,7 @@ backgroundImage: url('img/bg.jpg')
 
 <style>
 section {
-  padding: 50px;
+  padding: 30px 50px 30px;
 }
 </style>
 
@@ -3275,3 +3275,384 @@ public class AccessingDataJpaApplication {
 可以从*Spring Data JPA*的例子看到，我们只关心*接口*和*数据*的设计与使用，消除了我们手动操作、处理数据库的繁琐代码。
 
 再加上依赖注入，我们甚至都没有`new`过任何相关的类，全都交给*Spring*处理。
+
+---
+
+# Behavioral Patterns
+
+## Catalog
+
+行为模式告诉我们如何让系统中的对象协作：
+
+- *Template Method* 模版方法模式
+- *Iterator* 迭代器模式
+- *Visitor* 访问者模式
+- *Strategy* 策略模式
+
+---
+
+# Behavioral Patterns
+
+## Catalog
+
+行为模式实际上还有很多，但是其中有些模式我认为只是把比较直观的做法赋予了个名字，没有本质上的提升。因此我挑选了几个最为常用、最有代表性的行为模式进行讲解。
+
+行为模式描述的更多的是实现细节，因此后续描述时会直接介绍Java标准库中的例子而不介绍过于抽象的表达。~~绝对不是我想偷懒！~~
+
+---
+
+# Behavioral Patterns
+
+## Template Method
+
+*模版方法 Template Method*模式可以为方法比较多的接口提供一组共享的默认实现，来简化子类派生的过程。Java的集合框架也大量应用了这个模式，典型的命名特征是`Inter`接口和`AbstractInter`抽象类来提供模板实现。
+
+比如`List`接口有27个需要实现的方法。但实际上，一个最简单的、不可变的列表只需要实现一个`get(int)`方法即可。这种列表实际上用途也非常广泛，比如在整个程序中传递支持的文件类型列表信息等。`AbstractList`就为这种用途提供了除了`get(int)`之外的所有接口的模版实现。
+
+---
+
+# Behavioral Patterns
+
+## Template Method
+
+`AbstractList<E>`为不同功能的列表提供了不同的重载方式：
+
+- 不可变的列表只需要实现`get(int)` `size()`
+- 可变的列表需要实现`get(int)` `set(int, E)`
+- 可以扩展大小的列表还应该实现`add(int, E)` `remove(int)`
+
+其余的包括`addAll` `removeAll` `iterator` `subList` `contains`等其他方法全都可以由上述基本方法派生出来，并在模版方法里提供具体实现。
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+*迭代器 Iterator*相信大家或多或少都听说过。*Iterator*提供了顺序访问一组*聚合*对象的通用方法，而无需关心内部存储实现，比如用数组还是用哈希表等。
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+Java集合框架提供了`java.util.Iterator`用于描述集合元素迭代器：
+
+```java
+package java.util;
+public interface Iterator<E> {
+    boolean hasNext();
+    E next();
+    default void remove() { throw new UnsupportedOperationException("remove"); }
+    default void forEachRemaining(Consumer<? super E> action) {
+        Objects.requireNonNull(action);
+        while (hasNext())
+            action.accept(next());
+    }
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+它的接口都很简洁明了：
+
+- `hasNext()` 是否还有下一个元素，如果有，
+- `next()` 获取下一个元素
+- `remove()` 删除当前元素。默认不支持删除。
+- `forEachRemaining(Consumer<? super E> action)` 对后续所有元素应用`action`
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+`Iterator`的基本使用可以直接参考`forEachRemaining`的实现：
+
+```java
+var iter = getIterator();
+whiel(iter.hasNext()) {
+    var obj = iter.next();
+    // do something with obj
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+`java.lang.Iterable<T>`接口描述了可以被迭代的聚合对象：
+
+```java
+public interface Iterable<T> {
+    Iterator<T> iterator();
+
+    default void forEach(Consumer<? super T> action) {
+        Objects.requireNonNull(action);
+        for (T t : this) { action.accept(t); }
+    }
+    default Spliterator<T> spliterator() {
+        return Spliterators.spliteratorUnknownSize(iterator(), 0);
+    }
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+- `java.lang.Iterable<T>`只有一个接口函数：`iterator`，返回一个迭代器`Iterator<T>`。
+- `forEach`方法的实现展现了`Iterable`的另一种用法
+  - 除了使用`iterator()`方法获取迭代器并按照常规方法访问，Java支持*for-each*循环来遍历可迭代对象：
+  - `for (T t : iterable) { /* do something with t */ }`
+- `spliterator()`提供了*可并发的*迭代器实现
+
+---
+
+# Behavioral Patterns
+
+## Iterator
+
+Java集合框架和标准库的很多类都是可迭代的：
+
+- 集合框架本身就是元素的集合，因此自然都是可迭代的
+- `java.nio.file.Path`是自身的可迭代对象，便于分离目录结构
+- `java.nio.file.DirectoryStream<T>`是`T`的可迭代对象，用于获取目录下的所有文件和子目录信息
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+*访问者 Visitor*模式也是遍历一组对象所用的设计模式，但是与迭代器不同的是，访问者一般用于访问层次化、结构化对象，并且子对象的类型或者处理方式可能不同。最经典的例子就是文件目录访问者：`java.nio.file.FileVisitor`
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+```java
+package java.nio.file;
+
+public interface FileVisitor<T> {
+    FileVisitResult preVisitDirectory(T dir, BasicFileAttributes attrs)
+        throws IOException;   // 进入目录之前
+    FileVisitResult visitFile(T file, BasicFileAttributes attrs)
+        throws IOException;   // 处理文件
+    FileVisitResult visitFileFailed(T file, IOException exc)
+        throws IOException;   // 处理文件错误
+    FileVisitResult postVisitDirectory(T dir, IOException exc)
+        throws IOException;   // 目录遍历完成
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+`FileVisitResult`是一个枚举类型，用于控制后续访问目录的过程，比如继续遍历文件，或者在找到所需要的文件后退出等等：
+
+```java
+package java.nio.file;
+
+public enum FileVisitResult {
+    CONTINUE,      // 继续遍历
+    TERMINATE,     // 终止遍历
+    SKIP_SUBTREE,  // 继续遍历，但是跳过子目录下的所有文件/目录
+    SKIP_SIBLINGS; // 继续遍历，但是跳过同目录下的其他文件/目录
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+有时我们可能只需要某个方法的实现，这时就是*模版方法*体现作用的时候了。Java提供了`java.nio.file.SimpleFileVisitor<T>`作为`FileVisitor<T>`的空实现。实现的方式大概是没有错误的时候就`CONTINUE`，有异常就抛出异常终止整个过程。
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+使用`java.nio.file.Files#walkFileTree`遍历文件树：
+
+```java
+var start = Path.of(".");
+
+Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+    // ... Implementations
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+比如我们来统计目录下java源代码文件的数量，就可以：
+
+```java
+class FileCounter<T extends Path> extends SimpleFileVisitor<T> {
+    private int count = 0;
+    public int getCount() { return count; }
+
+    private final String ext;
+    public FileCounter(String ext) { this.ext = ext; }
+
+    // ...
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+```java
+class FileCounter<T extends Path> extends SimpleFileVisitor<T> {
+    // ...
+
+    @Override
+    public FileVisitResult visitFile(T file, BasicFileAttributes attrs) throws IOException {
+        if (file.endsWith(ext)) ++count;
+        return FileVisitResult.CONTINUE;
+    }
+    @Override
+    public FileVisitResult visitFileFailed(T file, IOException exc) throws IOException
+        { return FileVisitResult.CONTINUE; }
+    @Override
+    public FileVisitResult postVisitDirectory(T dir, IOException exc) throws IOException
+        { return FileVisitResult.CONTINUE; }
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Visitor
+
+```java
+public static void main(String[] args) throws IOException{
+    var visitor = new FileCounter<Path>(args[1]);
+
+    Files.walkFileTree(Path.of(args[0]), visitor);
+
+    System.out.println(
+        "Counts of " + args[1] + " file in " + args[0] + " = " + visitor.getCount()
+    );
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Strategy
+
+一个功能可能有多种不同的算法实现。抽象出*算法*实例的模式称为*策略 Strategy*模式。*Strategy*可以在运行时调配不同的算法实现，这对使用功能的客户端来说是无缝的。这个模式最经典的例子是对数组排序使用的不同*排序器 Comparator*。
+
+```java
+@FunctionalInterface
+public interface Comparator<T> {
+    int compare(T o1, T o2);
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Strategy
+
+比如我们要根据用户的年龄进行排序，可以定义这样的排序器：
+
+```java
+@Data
+class User {
+    private String name;
+    private int age;
+}
+
+public class UserComparator implements Comparator<User> {
+    int compare(User o1, User o2) {
+        return Integer.compare(o1.getAge(), o2.getAge());
+    }
+}
+```
+
+---
+
+# Behavioral Patterns
+
+## Strategy
+
+使用`Arrays#sort`排序数组，使用`Collections#sort`排序列表。它们均可以接受一个排序器作为第二个参数：
+
+```java
+User[] userArray = fetchUsers();
+
+Arrays.sort(userArray, new UserComparator());
+```
+
+---
+
+# Behavioral Patterns
+
+## Strategy
+
+有同学可能发现了，`Comparator`是一个*函数式接口*`@FunctionalInterface`，因此可以使用Lambda表达式：
+
+```java
+Arrays.sort(
+    userArray,
+    (var o1, var o2) -> Integer.compare(o1.getAge(), o2.getAge())
+);
+```
+
+---
+
+# Behavioral Patterns
+
+## Strategy
+
+`Comparator`还提供了一些工厂方法，用于产生各种各样的比较器实现：
+
+- `reversed()`：创建当前比较器的反转版
+- `thenComparing()`系列：当前比较器如果相等，那么再用提供的比较器或键值比较
+- `comparing()`系列：提取对象中的某个键进行比较
+
+---
+
+# Behavioral Patterns
+
+## Strategy
+
+比如我们要提供一个先根据年龄排序，再根据名字的长度排序，长度相同的忽略大小写进行排序的比较器，我们可以使用：
+
+```java
+var comparator = Comparator<User>
+        .comparingInt(User::getAge)
+        .thenComparing(User::getName, 
+            Comparator<>.comparingInt(String::length)
+                        .thenComparing(String.CASE_INSENSITIVE_ORDER);
+        )
+```

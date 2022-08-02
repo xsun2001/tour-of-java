@@ -75,17 +75,13 @@
   - Structural Patterns
     - *Adaptor*: `java.util.Arrays#asList()` `java.util.Collections#list()` `java.io.InputStreamReader(InputStream)`
     - *Decorator*: Stream IO / `java.util.Collections`
-    - *Composite*: Java swing
     - *Flyweight*: `java.lang.Integer#valueOf(int)`
     - *Proxy*: `javax.inject.Inject`
   - Behavioral patterns
-    - *Chain of responsibility*: `java.util.logging.Logger#log()`
-    - *Command*: `java.lang.Runnable`
-    - *Interpreter*: Regex `java.util.Pattern`
-    - *Iterator*: `java.util.Iterator`
-    - *Strategy*: `java.util.Comparator#compare()`
     - *Template Method*: Stream IO / Abstract Collection / `default` method
+    - *Iterator*: `java.util.Iterator`
     - *Visitor*: `java.nio.file.FileVisitor`
+    - *Strategy*: `java.util.Comparator#compare()`
 - CH4: Advanced language feature
   - *[JEP361, Java14]* Switch Expressions
   - *[JEP378, Java15]* Text Blocks
