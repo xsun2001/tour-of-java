@@ -3,6 +3,12 @@ theme: gaia
 marp: true
 paginate: true
 backgroundImage: url('img/bg.jpg')
+style: |
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
 ---
 
 <style>
@@ -166,22 +172,11 @@ OpenJDK 64-Bit Server VM Temurin-17.0.3+7 (build 17.0.3+7, mixed mode)
 
 # *CodeLab 0-1*: helloworld
 
-## Wait... What is *CodeLab* ?
-
-- 编程小练习，仅此而已
-- 我会带大家在课上都写一遍
-- GitHub仓库里提供了未完成供大家联系，也同时提供了完成的版本供大家参考
-- `tourofjava/chN/labM`
-
----
-
-# *CodeLab 0-1*: helloworld
+**第$i$章的CodeLab代码位于`codelab/chapter<i>/src`
 
 `Helloworld.java`
 
 ```java
-package tourofjava.ch0.lab1;
-
 public class Helloworld {
     public static void main(String[] args) {
         System.out.println("helloworld");
@@ -190,8 +185,8 @@ public class Helloworld {
 ```
 
 ```bash
-tour-of-java/codelab $ javac tourofjava/ch0/lab1/Helloworld.java
-tour-of-java/codelab $ java tourofjava.ch0.lab1.Helloworld
+codelab/chapter0/src $ javac Helloworld.java
+codelab/chapter0/src $ java Helloworld
 helloworld
 ```
 
@@ -202,9 +197,17 @@ helloworld
 *[JEP330, Java11]* Launch Single-File Source-Code Programs
 
 ```bash
-tour-of-java/codelab $ java tourofjava/ch0/lab1/Helloworld.java
+codelab/chapter0/src $ java Helloworld.java
 helloworld
 ```
+
+---
+
+# *CodeLab 0-1*: helloworld
+
+1. `public class Helloworld`：定义一个公开类`Helloworld`。Java规定一个`java`源文件应当有且只有一个公开类，且类名应该和文件名相同
+2. `public static void main(String[] args)`：Java的`main`函数写法，`String[] args`是命令行参数数组
+3. `System.out.println("helloworld");`：`System.out`是标准输出流，`println`是输出函数
 
 ---
 
@@ -264,6 +267,10 @@ helloworld
 
 ## Variable Declare & Assignment / Data types
 
+<div class="columns">
+
+<div>
+
 ```java
 jshell> int a;
 a ==> 0
@@ -279,11 +286,8 @@ jshell> boolean g = true
 g ==> true
 ```
 
----
-
-# Java is a *C-style* language
-
-## Variable Declare & Assignment / Data types
+</div>
+<div>
 
 ```java
 jshell> float c = 1.0
@@ -299,11 +303,31 @@ jshell> double d = 1.0
 d ==> 1.0
 ```
 
+</div>
+
+</div>
+
+---
+
+# Java is a *C-style* language
+
+## Variable Declare & Assignment / Data types
+
+- 整数类型：`byte` `short` `int` `long`分别为1、2、4、8字节*有符号*整数
+- 浮点数：`float` `double`分别为4、8字节浮点数
+- 逻辑值：`boolean`
+- 字符：`char` 2字节Unicode字符
+
 ---
 
 # Java is a *C-style* language
 
 ## Operators: Arithmetic
+
+
+<div class="columns">
+
+<div>
 
 ```java
 jshell> 1 + 1
@@ -319,6 +343,25 @@ $6 ==> 1
 jshell> -3 % 2
 $6 ==> -1
 ```
+
+</div>
+<div>
+
+```java
+jshell> int a = 1;
+a ==> 1
+jshell> a += 100;
+$17 ==> 101
+jshell> a *= 20;
+$18 ==> 2020
+jshell> a /= 3;
+$19 ==> 673
+jshell> a %= 20;
+$20 ==> 13
+```
+
+</div>
+</div>
 
 ---
 
@@ -347,6 +390,9 @@ $32 ==> 1
 
 ## Operators: Bitwise
 
+<div class="columns">
+<div>
+
 ```java
 jshell> 1 & 2
 $11 ==> 0
@@ -360,6 +406,71 @@ $13 ==> 3
 jshell> ~1
 $14 ==> -2
 ```
+
+</div>
+<div>
+
+```java
+jshell> 1 << 20;
+$21 ==> 1048576
+
+jshell> -1 << 20;
+$22 ==> -1048576
+
+jshell> 1024 >> 3;
+$23 ==> 128
+
+jshell> -1024 >> 3;
+$24 ==> -128
+
+jshell> -1024 >>> 3;
+$25 ==> 536870784
+```
+
+</div>
+</div>
+
+---
+
+# Java is a *C-style* language
+
+## Operators: Compare
+
+<div class="columns">
+<div>
+
+```java
+jshell> int a = 1, b = 2;
+a ==> 1
+b ==> 2
+
+jshell> a < b
+$3 ==> true
+
+jshell> a <= b
+$4 ==> true
+
+jshell> a == b
+$5 ==> false
+```
+
+</div>
+<div>
+
+```java
+jshell> a != b
+$8 ==> true
+
+jshell> a >= b
+$6 ==> false
+
+jshell> a > b
+$7 ==> false
+```
+
+
+</div>
+</div>
 
 ---
 
@@ -387,6 +498,18 @@ $17 ==> false
 ```java
 jshell> "hello" + "world"
 $10 ==> "helloworld"
+
+jshell> "1 + 1 = " + (1 + 1)
+$11 ==> "1 + 2 = 2"
+
+jshell> System.out.println("hello\nworld")
+hello
+world
+
+jshell> System.out.println("Col1\tCol2\n1\t2\n11111\t22222")
+Col1	Col2
+1	2
+11111	22222
 ```
 
 ---
@@ -518,15 +641,7 @@ jshell> boolean isPrime(int a) {
    ...>     return true;
    ...> }
 |  已创建 方法 isPrime(int)
-```
 
----
-
-# Java is a *C-style* language
-
-## Control Flow: `for`
-
-```java
 jshell> for (int a = 1; a <= 100; a++) {
    ...>     if (isPrime(a)) System.out.print(a + " ");
    ...> }
@@ -565,7 +680,7 @@ jshell> do {
    ...>     x = Math.random();
    ...> } while(x < 0.8);
 
-jshell> x
+jshell> x // is a random double >= 0.8
 x ==> 0.8346328176085303
 ```
 
@@ -578,12 +693,15 @@ x ==> 0.8346328176085303
 ```java
 jshell> var mapOfMap = new HashMap<String, Map<String, String>>()
 mapOfMap ==> {}
+
 jshell> mapOfMap.put("Java", Map.of("Type", "Strong-Typed", "Paradigm", "OOP"))
 $111 ==> null
+
 jshell> mapOfMap
 mapOfMap ==> {Java={Paradigm=OOP, Type=Strong-Typed}}
 
-jshell> mapOfMap.forEach((var key, var val) -> System.out.println(key + " : " + val))
+jshell> mapOfMap.forEach(
+    ..>     (var key, var val) -> System.out.println(key + " : " + val))
 Java : {Paradigm=OOP, Type=Strong-Typed}
 ```
 
@@ -592,6 +710,9 @@ Java : {Paradigm=OOP, Type=Strong-Typed}
 # Other basic syntax & API
 
 ## *[[JEP378](https://openjdk.org/jeps/378), Java15]* Text Blocks
+
+`"""`包含的字符串称为*文本块 TextBlock*。
+文本块允许使用`"`而不需转义，`\"""`则需要转义。
 
 ```java
 jshell> """
@@ -602,6 +723,59 @@ jshell> """
    ...> """
 $4 ==> "Line 1\nLine 2\nLine 3\nLine 4\n"
 ```
+
+---
+
+# Other basic syntax & API
+
+## *[[JEP378](https://openjdk.org/jeps/378), Java15]* Text Blocks
+
+使用`\`取消换行
+
+```java
+jshell> """
+   ...> Line 1 \
+   ...> Line 2 \
+   ...> Line 3 \
+   ...> Line 4 \
+   ...> """
+$5 ==> "Line 1 Line 2 Line 3 Line 4\n"
+```
+
+---
+
+# Other basic syntax & API
+
+## *[[JEP378](https://openjdk.org/jeps/378), Java15]* Text Blocks
+
+使用`\s`保证末尾空格不会删除，否则末尾空格会被替换为换行符。下面用`·`表示空格，而非实际字符：
+
+<div class="columns">
+<div>
+
+```java
+jshell> """
+   ...> red···
+   ...> green·
+   ...> blue··
+   ...> """
+$1 ==> "red\ngreen\nblue\n"
+```
+
+</div>
+<div>
+
+```java
+jshell> """
+   ...> red···\s
+   ...> green·\s
+   ...> blue··\s
+   ...> """
+$1 ==> "red···\ngreen·\nblue··\n"
+```
+
+</div>
+</div>
 
 ---
 
@@ -850,9 +1024,19 @@ $109 ==> 1.4142135623730951
 
 # *CodeLab 1-1* a +-*/^&| b
 
+- `codelab/chapter1/src/Lab1.java`
+- 标准输入输出
+- 输入格式：若干行`a op b`，其中`op`是`+-*/^&|`中的其中一种，以标准输入结束为终止
+- 输出格式：若干行计算结果
+- 提示：计算结果可能非常大
+
 ---
 
 # *CodeLab 1-2* QuickSort
+
+- `codelab/chapter1/src/Lab2.java`
+- 实现`public static void quickSort(int[] arr)`
+- 运行`main`方法会自动检测实现的正确性和算法复杂度是否吻合$O(n\log n)$
 
 ---
 
@@ -3656,3 +3840,22 @@ var comparator = Comparator<User>
                         .thenComparing(String.CASE_INSENSITIVE_ORDER);
         )
 ```
+
+---
+
+# Recap
+
+设计模式是面向对象编程的重要一环。上面讲的内容可能确实较多也比较难以理解，但是这些知识都不限于Java，其他面向对象编程语言都可以应用，而且对各位的OOP课程应该有比较大的帮助。
+
+最后一点：
+
+**不要首先考虑设计模式，要首先考虑具体要实现的功能。** 与其在象牙塔上分析到底怎么实现比较好，不如先用具体的类写一写。在软件系统逐步演进、复杂度逐渐提高的过程中，再关注系统中耦合程度高、扩展困难、设计臃肿的地方，然后运用合适设计模式进行重构。
+
+---
+
+<!-- _class: lead -->
+
+# *Chapter 4*
+# Advanced language feature
+
+---
