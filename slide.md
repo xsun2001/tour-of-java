@@ -2743,6 +2743,535 @@ class Singleton {
 
 1. *Adapter* 适配器模式
 2. *Decorator* 装饰器模式
-3. *Composite* 组合模式
-4. *Flyweight* 享元模式
-5. *Proxy* 代理模式
+3. *Flyweight* 享元模式
+4. *Proxy* 代理模式
+
+---
+
+# Structural Patterns
+
+## Adapter
+
+*适配器 Adapter*模式，顾名思义，是通过*Adapter*类将两个不兼容的接口连接到一起，如下面的例子：
+
+```java
+interface AppleLightning { /* ... */ }
+interface UsbTypeC       { /* ... */ }
+
+class TypeC2Lightning implements AppleLightning {
+    private final UsbTypeC usb;
+    public TypeC2Lightning(UsbTypeC usb) { this.usb = usb; }
+    // Lightning methods
+}
+```
+
+---
+
+# Structural Patterns
+
+## Adapter
+
+Java标准库中最常用的适配器，就是连接`Reader` `Writer`与`InputStream` `OutputStream`的`InputStreamReader` `OutputStreamWriter`
+
+- `Reader` `Writer`：用于读取**字符流**
+- `InputStream` `OutputStream`：用于读取**字节流**
+- `InputStreamReader` `OutputStreamWriter`：适配器类，用于处理原始**字节流**，通过字符集编码等信息转化为**字符流**
+
+---
+
+# Structural Patterns
+
+## Adapter
+
+```java
+var fileInput = new FileInputStream("input.txt");
+var fileReader = new InputStreamReader(fileInput, "UTF-8");
+var charBuf = new char[100];
+var charCount = fileReader.read(charBuf, 0, 100);
+var str = new String(charBuf);
+```
+
+---
+
+# Structural Patterns
+
+## Adapter
+
+适配器模式的使用场景比较明显，写法也比较直接，因此介绍的篇幅较短。但是要注意，请不要滥用适配器，否则会对类型系统带来混乱，增加无用代码的数量。
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+*装饰器 Decorator*模式相信大家都已经很熟悉了，大家的python课程应该讲过python对装饰器函数的语法支持。装饰器和适配器都是*包装*对象的模式，但是装饰器的重要区别在于，它是将接口包装到*同一个*接口，只不过装饰上增强的功能性。而适配器是包装为另一个不兼容的接口。
+
+考虑VSCode的代码区，是在最朴素的文本区上，加入了缩略图、滚动条等组件，而且缩略图这种组件实际上在配置中是可以移除的。需要添加额外功能并支持动态添加/移除时，就应当使用装饰器模式。
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+```java
+class Component { /* ... */ }
+class TextArea extends Component { /* ... */ }
+
+class ThumbnailDecorator extends TextArea {
+    private final TextArea internal;
+    public ThumbnailDecorator(TextArea textArea) { internal = textArea;}
+}
+
+class ScrollBarDecorator extends Component {
+    private final Component internal;
+    public ScrollBarDecorator(Component comp) { internal = comp;}
+}
+```
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+```java
+class GUIFactory {
+    public static Component createCodeArea(boolean enableThumbnail) {
+        var textArea = new TextArea();
+        return enableThumbnail ? new ScrollBarDecorator(new ThumbnailDecorator(textArea))
+                               : new ScrollBarDecorator(textArea);
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+`java.io`包的设计处处体现了装饰器模式。我们以输入流为例：
+
+- `java.io.InputStream` 是通用的基类，基本功能就是`read`读取一个字节或者字节数组
+- 终端流，即真正产生数据的流：
+  - `java.io.ByteArrayInputStream` 从字节数组中读
+  - `java.io.FileInputStream` 从文件中读
+  - `java.io.PipedInputStream` 从连接到的另一个输出流中读
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+`java.io`包的设计处处体现了装饰器模式。我们以输入流为例：
+
+- 装饰器流，即为现有流添加额外功能的流：
+  - `java.io.BufferedInputStream` 为现有流加个缓冲区以提升性能
+  - `java.util.zip.CheckedInputStream` 边读边算CRC32等校验码
+  - `java.util.zip.Inflater/DeflaterInputStream` 解压缩/压缩原始数据
+  - `java.security.DigestInputStream` 边读边算MD5/SHA-1等消息摘要
+  - `javax.crypto.CipherInputStream` 将原始数据通过AES/RSA等密钥算法加密/解密
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+```java
+var fileInput = new FileInputStream("data.gzip");
+var checkedInput = new CheckedInputStream(fileInput, new CRC32());
+var gzipInput = new GZIPInputStream(checkedInput);
+
+var data = gzipInput.readAllBytes();
+var checksum = checkedInput.getChecksum().getValue();
+assert(checksum == 1234567890L);
+```
+
+---
+
+# Structural Patterns
+
+## Decorator
+
+装饰器模式带来的好处有：
+
+1. 保证*单一职责原则*。可以看到，上面我介绍的一大堆输入流子类都可以用简短的一句话描述它们的全部功能。
+2. 提供比继承更多的灵活性。我们可以任意组合装饰器流来加任何我们想使用的功能。
+
+但是也有一些小缺点需要注意：
+
+1. 可能会留下一大堆散件，比如获取校验码你仍然需要保留`checkedInput`
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+考虑Minecraft，一个（最初）使用Java编写的、全球最知名的沙盒游戏之一。Minecraft的地形由一大堆方块组成，而这些方块都带有自己的数据，比如位置、方向、材质、碰撞箱、变种与其他信息（如铁砧损坏程度等）。我们很容易给出下面的简单设计：
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+```java
+abstract class Block {
+    protected int x, y, z, facing;
+    protected int hardness, toolLevel, resistance;
+    protected Image texture;
+    protected AABB aabb;
+    public Block( /* ... */ ) { /* ... */ }
+
+    public abstract void onTick();
+    public abstract void onClick(Player player, int button);
+    public abstract void onDestroy(Entity destroyer);
+    // ...
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+```java
+class LogBlock extends Block {
+    private int woodType;
+    // Implementation of abstract methods ...
+}
+class AnvilBlock extends Block {
+    private int damageType;
+    // Implementation of abstract methods ...
+}
+class Cobblestone extends Block { /* ... */ }
+class Bedrock extends Block { /* ... */ }
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+```java
+class World {
+    private List<Block> blocks = new ArrayList<Block>();
+    
+    Block getBlockAt(int x, int y, int y) {
+        // ...
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+但是这种方法显然存在较大的性能问题：
+
+有很多数据对于相同种类的方块都是重复的，没有必要每个位置都单独存一遍。对于Minecraft这种，世界大小上限约为$6\times 10^6 \times 6\times 10^6  \times 400$个`Block`的巨型对象，这些重复数据对于内存和硬盘空间来说都是不可接受的。
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+我们可以通过分离重复的数据和不重复的数据，或称为*固有状态 intrinsic*和*外围状态 extrinsic*，通过分离存储两种状态的对象，来减少运行时内存占用。比如，方块的材质、硬度、爆炸抗性等信息是固有状态，方块的位置、朝向等信息是外围状态。
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+为了区分外围状态，一种方法是为方块的更新或事件处理函数加入外围状态参数：
+
+```java
+abstract class Block {
+    public abstract void onTick(ExtrinsicBlockState states);
+    // ...
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+另一种方式是直接为外围状态添加公开的`set`方法：
+
+```java
+abstract class Block {
+    void setX(int x) { this.x = x; }
+    void setY(int y) { this.y = y; }
+    void setZ(int z) { this.z = z; }
+    // ...
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+然后通过工厂类和享元对象池等技术储存、构建不同固有状态的方块的享元：
+
+```java
+class BlockFactory {
+    private static Block createBlockInstance(int blockId) {
+        return switch(blockId) {
+            case 0 -> new Cobblestone();
+            case 1 -> new AnvilBlock();
+            // ...
+        }
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+然后通过工厂类和享元对象池等技术储存、构建不同固有状态的方块的享元：
+
+```java
+class BlockFactory {
+    private Map<Integer, Block> blockPool = new HashMap<>();
+    public Block getBlockInstance(int blockId) {
+        return blockPool.computeIfAbsent(
+            blockId,
+            BlockFactory::createBlockInstance
+        );
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+这样，`World`就不需要存储整个`Block`了，而只需要`blockId`指定享元对象，并在具体操作之前设置外围状态即可。
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+```java
+class World {
+    private int[] blocks;
+    private BlockFactory factory = new BlockFactory();
+    public void tick() {
+        // for xyz...
+            var block = factory.getBlockInstance(blocks[idx]);
+            block.setX(x); block.setY(y); block.setZ(z);
+            block.onTick();
+        // end for
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+Java中的享元实例是基本整数数据类型的包装类的`valueOf`方法：
+
+```java
+public final class Integer extends Number implements Comparable<Integer>, Constable, ConstantDesc {
+    private static class IntegerCache {
+        static final Integer[] cache;
+    }
+
+    @IntrinsicCandidate
+    public static Integer valueOf(int i) {
+        if (i >= IntegerCache.low && i <= IntegerCache.high)
+            return IntegerCache.cache[i + (-IntegerCache.low)];
+        return new Integer(i);
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Flyweight
+
+如果基本类型的值在缓存范围内，就返回缓存的对象引用。对于`Integer`，根据Java语言规范，默认缓存$[-128, 127]$的整数。
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+考虑远程过程调用（Remote Procedure Call, RPC），我们需要在本地调用远程代码。但是显然我们不可能`new`一个远程对象，我们不知道它具体的实现，更不知道怎么管理别的机器的内存。这时我们就需要一个*代理 Proxy*类作为本地的占位符，代替本地代码发送远程过程调用请求。这样我们可以和具体实现解耦合，甚至可以无缝在本地实现和远程代码实现之间转换。
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+```java
+interface UserInfoRepo {
+    List<String> getAllUserName();
+}
+
+class RPCUserInfoRepo implements UserInfoRepo {
+    private final String httpEndpoint;
+    public RPCUserInfoRepo(String endpoint) { httpEndpoint = endpoint; }
+    @Override public List<String> getAllUserName() {
+        // 1. Send HTTP Request
+        // 2. Parse JSON Result
+        // 3. Return List<String>
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+```java
+interface UserInfoRepo {
+    List<String> getAllUserName();
+}
+
+class DBUserInfoRepo implements UserInfoRepo {
+    private final Connection db;
+    public DBUserInfoRepo(Connection db) { this.db = db; }
+    @Override public List<String> getAllUserName() {
+        // 1. sql: SELECT name FROM user
+        // 2. Return List<String>
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+但是真正让代理模式在Java发光发热的是*真正的动态性*。Java允许在运行时改变字节码，创造新的类，换句话说，*运行时编译代码*。比如上例中的`RPCUserInfoRepo`和`DBUserInfoRepo`都不需要我们手动编写，我们只要声明：我们需要使用一个用户信息仓库，支持框架会自动生成、创建实现类并实例化对象供我们使用。
+
+我们这次使用[**Spring Data JPA**](https://spring.io/projects/spring-data-jpa)作为例子。[*Spring*](https://spring.io/)是Java最流行的后端框架的集合，*Spring Data*是其关系型数据库支持，[*JPA*](https://jakarta.ee/specifications/persistence/3.0/)是*Java/Jakarta Persistence API*的缩写，是持久化层的API描述。
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+我们声明一个`User`类：
+
+```java
+@Entity
+@Data
+public class User {
+  @Id
+  @GeneratedValue(strategy=GenerationType.AUTO)
+  private Long id;
+  @NonNull private String nickName;
+  @NonNull private String email;
+}
+```
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+我们声明我们需要的数据仓库的接口，比如我们需要寻找对应昵称的所有用户：
+
+```java
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
+    List<User> findAllByNickName(String nickName);
+}
+```
+
+[*CrudRepository*](https://docs.spring.io/spring-data/commons/docs/current/api/org/springframework/data/repository/CrudRepository.html) 也内置了大量常用函数，包括`findAll` `save` `delete` `count`等。
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+```java
+@SpringBootApplication
+public class AccessingDataJpaApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AccessingDataJpaApplication.class);
+    }
+    @Bean
+    public CommandLineRunner demo(UserRepository repo) {
+        return (args) -> {
+            repo.save(new User("xsun2001", "xcx19@mails.tsinghua.edu.cn"));
+            var userList = repo.findAll();
+        };
+    }
+}
+```
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+我们做了如下事情：
+
+1. 定义了数据格式`User`类
+2. 定义了我们想要的查询、更新方法`UserRepository`
+3. 直接使用`UserRepository`进行数据操作
+4. 让Spring启动程序
+
+但是Spring替我们做的事情包括但不限于：
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+1. 自动发现`User`，根据`User`内部的注解和成员变量，自动生成数据库表生成语句，如有必要，自动合并、迁移、重整已有数据表中的数据
+2. 自动发现`UserRepository`，根据方法名称、参数、返回值等信息，自动解析生成SQL语句，自动处理数据库连接和SQL执行，自动组织数据库的执行结果，生成本节所说的*Proxy*类
+3. 自动发现`@Bean public CommandLineRunner demo(UserRepository repo)`，根据参数得知我们想要一个`UserRepository`实现，因此实例化代理类并注入。根据返回值类型判断需要运行返回结果。
+
+---
+
+# Structural Patterns
+
+## Proxy
+
+*动态代理*配合*依赖注入*是究极解耦合方案。因此Java自己也不知道实现代码到底放在哪里，直到真正需要的时候才会自动生成。
+
+可以从*Spring Data JPA*的例子看到，我们只关心*接口*和*数据*的设计与使用，消除了我们手动操作、处理数据库的繁琐代码。
+
+再加上依赖注入，我们甚至都没有`new`过任何相关的类，全都交给*Spring*处理。
