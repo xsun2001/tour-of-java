@@ -14,10 +14,11 @@
     - Control Flow
   - New structure
     - String
+    - *[JEP378, Java15]* Text Blocks
     - Terminal IO
     - BigInt
     - Array
-    - Enum
+    - *[JEP286, Java10]* `var` type inference
   - CodeLab 1-1: Triangle of Stars
   - CodeLab 1-2: a =-*/ b
   - CodeLab 1-3: QuickSort
@@ -36,6 +37,9 @@
     - Create a object
     - Java has Garbage-Collector
   - CodeLab 2-1: Create & Use a Car
+    - Define class, members
+    - Create & use objects
+    - `static` fields and methods
   - Reuse Class
     - Composition
     - Inheritance
@@ -62,7 +66,7 @@
     - Why Inner class
       - Multiple inheritance
       - Closure
-  - `static` fields and methods
+  - Enum
 - CH3: Design Patterns
   - Why using Design Patterns
   - Overview
@@ -84,14 +88,11 @@
     - *Strategy*: `java.util.Comparator#compare()`
 - CH4: Advanced language feature
   - *[JEP361, Java14]* Switch Expressions
-  - *[JEP378, Java15]* Text Blocks
   - *[JEP394, Java16]* Pattern Matching for `instanceof`
   - *[JEP395, Java16]* Records
   - Annotation
   - Exception & Error handling
   - Generic
-  - *[JEP286, Java10]* `var` type inference
-  - *[JEP409, Java17]* Sealed Classes
   - Features in preview
     - *[JEP427, Java19]* Pattern Matching for switch
     - *[JEP405, Java19]* Record Patterns
