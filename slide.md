@@ -4518,3 +4518,200 @@ public static void main(String[] args) throws IOException {
 你可以使用Java标准库中提供的异常类，请参见[API Ref](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html)中的`Direct Known Subclasses`小节寻找是否有自己需要的异常类。
 
 通过继承自`java.lang.Exception`或`java.lang.RuntimeException`，你也可以创建自定义的受检异常和非受检异常类。你可以让其包含更多调试信息或生成更清晰直观的`toString()`表示。
+
+---
+
+# Advanced language feature
+
+## Generic
+
+在没有*范型 Generic*，所有的列表都是`java.util.List`的实现类，而它是可以存储任意对象的，即`java.lang.Object`。如果我们想存一个文件名列表，还需要进行强制类型转换：
+
+```java
+List filenames = new ArrayList();
+filename.add("file1.txt");
+
+String aFile = (String) filenames.get(0);
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+首先，我们不期望这个`filenames`里面存在任何非字符串的对象，但是没有禁止我们插入：
+
+```java
+filenames.add(114514);
+```
+
+这样在运行时，无辜的代码会执行`(String)`类型转换但是发现不行，于是大声的喊出“哼哼哼啊啊啊`java.lang.ClassCastException`啊啊啊啊”
+
+---
+
+# Advanced language feature
+
+## Generic
+
+另一方面，在每次使用的时候都进行一遍类型转化显然是非常蠢的语法。
+
+所以有什么办法能够将我们的列表和字符串类型绑定在一起呢？这就是*范型*：
+
+```java
+var filenames = new ArrayList<String>();
+filename.add("file1.txt");
+String aFile = filename.get(0);
+
+// filename.add(114514);
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+使用范型的语法如上所示，在类型名后面的`<>`内依次输入*类型参数*即可：
+
+```java
+List<String> // 存储String的List列表
+Function<String, Integer> // 接受String类型参数返回一个整数的函数
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+定义范型类或接口的方法也和使用的方法相似，我们使用*类型变量*来作为需要关联的类型的占位符：
+
+```java
+public interface List<T> {
+    T get(int index);
+    void add(T t);
+    void set(int index, T t);
+    // ...
+}
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+定义范型方法的方式略有不同，你需要在返回值类型前加入类型变量列表。使用范型方法时，需要在`.`和方法名之间插入类型参数列表。
+
+```java
+class ArrayUtil {
+    public static <T> T getMiddle(T... a) {
+        return a[a.length / 2];
+    }
+}
+
+var middle = ArrayUtil.<String>getMiddle("one", "two", "three"); // "two"
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+在几乎大多数情况下，类型参数列表可以自动推导：
+
+```java
+var middle = ArrayUtil.getMiddle("one", "two", "three");
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+有时我们不想要所有类型都混入我们的方法中，因此需要对类型变量做一些限定，比如下面寻找数组最小值的方法：
+
+```java
+class ArrayUtil {
+    public static <T> T getMin(T[] a) {
+        if (a == null || a.length == 0) return null;
+        T min = a[0];
+        for(int i = 1;i<a.length;i++)
+            if (min.compareTo(a[i]) > 0)
+                min = a[i];
+        return min;
+    }
+}
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+但是并不是所有的对象都支持正确的比较方法，因此我们限定`T`应当是可比较的，即`Comparable`。
+
+```java
+class ArrayUtil {
+    public static <T extends Comparable> T getMin(T[] a) {
+        if (a == null || a.length == 0) return null;
+        T min = a[0];
+        for(int i = 1;i<a.length;i++)
+            if (min.compareTo(a[i]) > 0)
+                min = a[i];
+        return min;
+    }
+}
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+如果想要`T`同时是多个接口的实现类，那么可以使用`&`连接这些接口：
+
+`<T extends Comparable & Serializable>`
+
+---
+
+# Advanced language feature
+
+## Generic
+
+由于Java限制，下面代码是不能通过编译的：
+
+```java
+class Person {}
+class Student extends Person {}
+
+public static void printPersons(List<Person> persons) { /* ... */ }
+
+public static void main(String[] args) {
+    var students = new ArrayList<Student>();
+    // add students
+    printPersons(students);
+}
+```
+
+---
+
+# Advanced language feature
+
+## Generic
+
+简单来说，就是虽然`Student`是`Person`的子类型，但是`List<Student>`不是`List<Person>`的子类型。这听起来确实有点反直觉，因为学生的列表就应该是人的列表。
+
+为了解决这种情况，Java引入了通配符类型`?`，用于表示类型参数的派生：
+
+```java
+public static void printPersons(List<? extends Person> persons) {
+    for(Person p : persons)
+        System.out.println(p);
+}
+```
