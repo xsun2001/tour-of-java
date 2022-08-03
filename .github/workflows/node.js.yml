@@ -11,10 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 16.x
-        cache: 'npm'
     - run: npm_config_yes=true npx @marp-team/marp-cli@latest slide.md -o build/index.html
     - uses: JamesIves/github-pages-deploy-action@v4
       with:
