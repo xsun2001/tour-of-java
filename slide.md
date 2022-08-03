@@ -379,9 +379,9 @@ jshell> --a
 $30 ==> 1
 
 jshell> a++
-$31 ==> 2
+$31 ==> 1
 jshell> a--
-$32 ==> 1
+$32 ==> 2
 ```
 
 ---
@@ -500,7 +500,7 @@ jshell> "hello" + "world"
 $10 ==> "helloworld"
 
 jshell> "1 + 1 = " + (1 + 1)
-$11 ==> "1 + 2 = 2"
+$11 ==> "1 + 1 = 2"
 
 jshell> System.out.println("hello\nworld")
 hello
